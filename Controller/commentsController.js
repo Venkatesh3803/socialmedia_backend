@@ -24,18 +24,20 @@ export const postComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
     const id = req.params.id;
     const post = await postModel.findById(id)
-  
+    const { commentId } = req.body
     try {
         if (post) {
-            await post.updateOne(forEach(element => {
-                element.comments._id !== req.body.commentId
-            }))
+            await post.updateOne({
+                $pull: ({
+                    comments: [commentId]   
+                })
+            })
             res.status(200).json("comment deleted")
         } else {
-            res.status("404").json("posts not avaliable")
+            res.status(404).json("posts not avaliable")
         }
     } catch (error) {
-
+        res.status(500).json({message: error.message})
     }
 }
 
